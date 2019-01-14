@@ -108,4 +108,5 @@ Priority from high to low:
 
 * LogGroup expiration for Lambda
 * Encryption at rest for S3 and DynamoDB with KMS
+* Custom domain in AWS API gateway with serverless. See [here](https://serverless.com/blog/serverless-api-gateway-domain/ "Serverless How to") 
 * Administrator Website (upload Whitepapers to S3, see data (name, email) of Whitepaper requester)
