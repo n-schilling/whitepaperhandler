@@ -1,0 +1,62 @@
+<html>
+  <style>
+  .tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+  }
+
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    top: -5px;
+    right: 105%;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+  }
+
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+  }
+  </style>
+  <head>
+    <title>Whitepaper example form</title>
+    <meta charset="utf-8">
+    <script language="javascript" type="text/javascript" src="./main.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <center><h1>Whitepaper example form</h1>
+    <div class="mainDiv" id="mainDiv">
+      <table style="text-align: left; width: 140px;" border="0"
+       cellpadding="1" cellspacing="1">
+        <tbody>
+          <tr>
+            <td>Name:</td>
+            <td><input type="text" id="name"/></td>
+          </tr>
+          <tr>
+            <td>Email address: </td>
+            <td><input type="email" id="email"/></td>
+          </tr>
+          <tr>
+            <td><div class="tooltip">Data Protection & Privacy:<span class="tooltiptext">You agree that your entered data is stored and processed for marketing purposes.</span></div> </td>
+            <td><input type="checkbox" id="dataProtection"/></td>
+          </tr>
+        </tbody>
+      </table>
+      <br><br>
+      <button id="sendRequest">Get whitepaper</button>
+      <br><br>
+      <div class="responseDiv" id="responseDiv"></div>
+    </div>
+    </center>
+  </body>
+</html>

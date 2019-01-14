@@ -1,0 +1,94 @@
+plugins:
+  - serverless-pseudo-parameters
+  - serverless-plugin-tracing
+  - serverless-api-gateway-xray
+
+service: WhitepaperHandler
+
+custom:
+  senderEmailAddress: '<your email address'
+  s3BucketName: '<your bucket name>' # the name must be globaly unique
+  dynamoDbTable: 'WhitepaperHandler' #Please do not change unless you really need to
+  apiGatewayXray: true # Please do not change
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: dev
+  region: eu-west-1
+  tracing: true
+  apiKeys:
+    - WhitepaperHandlerKey
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "cloudwatch:PutMetricData"
+        - "ses:SendEmail"
+        - "s3:ListAllMyBuckets"
+        - "s3:HeadBucket"
+      Resource: '*'
+    - Effect: Allow
+      Action:
+        - "dynamodb:PutItem"
+      Resource: "arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.dynamoDbTable}"
+    - Effect: Allow
+      Action:
+        - "s3:Get*"
+        - "s3:List*"
+      Resource:
+        - "arn:aws:s3:::${self:custom.s3BucketName}"
+        - "arn:aws:s3:::${self:custom.s3BucketName}/*"
+  iamManagedPolicies:
+    - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
+    - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  usagePlan:
+    quota:
+      limit: 100
+      offset: 2
+      period: MONTH
+    throttle:
+      burstLimit: 20
+      rateLimit: 10
+
+functions:
+  WhitepaperHandler:
+    handler: handler.whitepaperhandler
+    description: WhitepaperHandler
+    memorySize: 128
+    timeout: 10
+    environment:
+      s3BucketName: ${self:custom.s3BucketName}
+      senderEmailAddress: ${self:custom.senderEmailAddress}
+      UrlExpirationTimeInMS: 86400
+      cloudwatchTopic: WhitepaperHandler
+      dynamoDbTable: ${self:custom.dynamoDbTable}
+      AWS_XRAY_CONTEXT_MISSING: LOG_ERROR
+      AWS_XRAY_TRACING_NAME: WhitepaperHandler
+    events:
+      - http:
+          path: /
+          method: post
+          cors: true
+          private: true
+
+resources:
+  Resources:
+    S3WhitepaperArchive:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.s3BucketName}
+        AccessControl: 'Private'
+
+    DynamoDBWhitepaperArchive:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.dynamoDbTable}
+        AttributeDefinitions:
+        - AttributeName: timestamp
+          AttributeType: S
+        KeySchema:
+        - AttributeName: timestamp
+          KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
