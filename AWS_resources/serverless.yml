@@ -17,6 +17,7 @@ provider:
   stage: dev
   region: eu-west-1
   tracing: true
+  cfLogs: true
   apiKeys:
     - WhitepaperHandlerKey
   iamRoleStatements:
@@ -40,7 +41,6 @@ provider:
         - "arn:aws:s3:::${self:custom.s3BucketName}/*"
   iamManagedPolicies:
     - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
-    - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
   usagePlan:
     quota:
       limit: 100
@@ -92,3 +92,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+
+    WhitepaperHandlerLogGroup:
+      Properties:
+        RetentionInDays: 7
